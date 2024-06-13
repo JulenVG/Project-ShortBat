@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             loadExcel = new MaterialSkin.Controls.MaterialButton();
-            textBoxData = new MaterialSkin.Controls.MaterialMultiLineTextBox();
+            matrix = new RichTextBox();
             SuspendLayout();
             // 
             // loadExcel
@@ -41,7 +41,7 @@
             loadExcel.Depth = 0;
             loadExcel.HighEmphasis = true;
             loadExcel.Icon = null;
-            loadExcel.Location = new Point(756, 668);
+            loadExcel.Location = new Point(751, 794);
             loadExcel.Margin = new Padding(4, 6, 4, 6);
             loadExcel.MouseState = MaterialSkin.MouseState.HOVER;
             loadExcel.Name = "loadExcel";
@@ -54,19 +54,16 @@
             loadExcel.UseVisualStyleBackColor = false;
             loadExcel.Click += buttonLoadExcel_Click;
             // 
-            // textBoxData
+            // matrix
             // 
-            textBoxData.BackColor = Color.FromArgb(255, 255, 255);
-            textBoxData.BorderStyle = BorderStyle.None;
-            textBoxData.Depth = 0;
-            textBoxData.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
-            textBoxData.ForeColor = Color.FromArgb(222, 0, 0, 0);
-            textBoxData.Location = new Point(282, 73);
-            textBoxData.MouseState = MaterialSkin.MouseState.HOVER;
-            textBoxData.Name = "textBoxData";
-            textBoxData.Size = new Size(1099, 510);
-            textBoxData.TabIndex = 1;
-            textBoxData.Text = "";
+            matrix.BackColor = Color.Black;
+            matrix.BorderStyle = BorderStyle.None;
+            matrix.Location = new Point(953, 125);
+            matrix.Multiline = true;
+            matrix.Name = "matrix";
+            matrix.Size = new Size(567, 586);
+            matrix.TabIndex = 1;
+            matrix.SelectionColor = Color.White;
             // 
             // Form1
             // 
@@ -74,7 +71,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(64, 64, 64);
             ClientSize = new Size(1715, 876);
-            Controls.Add(textBoxData);
+            Controls.Add(matrix);
             Controls.Add(loadExcel);
             Name = "Form1";
             Text = "Form1";
@@ -86,6 +83,6 @@
         #endregion
 
         private MaterialSkin.Controls.MaterialButton loadExcel;
-        private MaterialSkin.Controls.MaterialMultiLineTextBox textBoxData;
+        private RichTextBox matrix;
     }
 }

@@ -1,5 +1,6 @@
 using OfficeOpenXml;
 using System.IO;
+using System.Windows.Forms.VisualStyles;
 
 namespace Project_ShortBat
 {
@@ -8,11 +9,6 @@ namespace Project_ShortBat
         public Form1()
         {
             InitializeComponent();
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
         }
 
         private void buttonLoadExcel_Click(object sender, EventArgs e)
@@ -97,11 +93,13 @@ namespace Project_ShortBat
                     Directory.CreateDirectory(destinationFolderPath);
                 }
 
-                // Buscar archivos de manera recursiva en la carpeta de origen y subcarpetas
+                // Iterar sobre cada archivo en fileNames
                 foreach (string fileName in fileNames)
                 {
-                    // Buscar archivos en todas las subcarpetas
                     string[] foundFiles = Directory.GetFiles(sourceFolderPath, fileName, SearchOption.AllDirectories);
+
+                    // Actualizar visualmente el estado en el TextBox
+                    UpdateStatusRichTextBox(fileName, foundFiles.Length > 0);
 
                     foreach (string foundFile in foundFiles)
                     {
@@ -110,11 +108,20 @@ namespace Project_ShortBat
                         // Verificar si el archivo existe antes de copiarlo
                         if (File.Exists(foundFile))
                         {
-                            File.Copy(foundFile, destinationFilePath, true);
+                            try
+                            {
+                                File.Copy(foundFile, destinationFilePath, true);
+                                UpdateStatusRichTextBox(fileName, true, true); // Marcar como encontrado (verde)
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Error al copiar el archivo '{foundFile}': {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                UpdateStatusRichTextBox(fileName, true, false); // Marcar como error (rojo)
+                            }
                         }
                         else
                         {
-                            //MessageBox.Show($"El archivo '{foundFile}' no existe en la carpeta seleccionada.");
+                            UpdateStatusRichTextBox(fileName, false, false); // Marcar como no encontrado (rojo)
                         }
                     }
                 }
@@ -122,5 +129,36 @@ namespace Project_ShortBat
                 MessageBox.Show("Archivos copiados correctamente a la carpeta 'patata' en el escritorio.");
             }
         }
+        private void UpdateStatusRichTextBox(string fileName, bool found, bool success = false)
+        {
+            matrix.Invoke((MethodInvoker)delegate {
+                matrix.SelectionStart = matrix.TextLength;
+                matrix.SelectionLength = 0;
+
+                if (found)
+                {
+                    if (success)
+                    {
+                        matrix.SelectionColor = Color.Green;
+                        matrix.AppendText(fileName + " OK" + Environment.NewLine);
+                    }
+                    else
+                    {
+                        matrix.SelectionColor = Color.Red;
+                        matrix.AppendText(fileName + " KO" + Environment.NewLine);
+                    }
+                }
+                else
+                {
+                    matrix.SelectionColor = Color.Gray;
+                    matrix.AppendText(fileName + " No encontrado" + Environment.NewLine);
+                }
+
+                matrix.SelectionColor = matrix.ForeColor; // Reset color
+                matrix.SelectionStart = matrix.Text.Length;
+                matrix.ScrollToCaret();
+            });
+        }
+
     }
 }
