@@ -1,6 +1,8 @@
 using OfficeOpenXml;
+using Project_ShortBat.Models;
 using System.IO;
 using System.Windows.Forms.VisualStyles;
+using Project_ShortBat.Models;
 
 namespace Project_ShortBat
 {
@@ -19,12 +21,16 @@ namespace Project_ShortBat
             {
                 string filePath = openFileDialog.FileName;
                 ProcessExcelFile(filePath);
+                if (checkSubCarpetas.Checked) 
+                { 
+
+                }
             }
         }
         private void ProcessExcelFile(string filePath)
         {
             FileInfo fileInfo = new FileInfo(filePath);
-            List<string> fileNamesToCopy = new List<string>();
+            List<Murcielago> murcielagos = new List<Murcielago>();
 
             using (ExcelPackage package = new ExcelPackage(fileInfo))
             {
@@ -34,48 +40,61 @@ namespace Project_ShortBat
                 {
                     int rowCount = worksheet.Dimension.Rows;
                     int colCount = worksheet.Dimension.Columns;
-                    int autoIdColumnIndex = -1;
-                    int inFileColumnIndex = -1;
+                    int carpetaColumnIndex = -1;
+                    int especieColumnIndex = -1;
+                    int audioColumnIndex = -1;
 
-                    // Encuentra los índices de columna para "AUTO ID" y "IN FILE"
+                    // Encuentra los índices de columna para "PUNTO", "AUTO ID*" y "IN FILE"
                     for (int col = 1; col <= colCount; col++)
                     {
                         string columnName = worksheet.Cells[1, col].Text.Trim(); // Suponiendo que los encabezados están en la primera fila
-                        if (columnName == "AUTO ID*")
+                        if (columnName == "PUNTO")
                         {
-                            autoIdColumnIndex = col;
+                            carpetaColumnIndex = col;
+                        }
+                        else if (columnName == "AUTO ID*")
+                        {
+                            especieColumnIndex = col;
                         }
                         else if (columnName == "IN FILE")
                         {
-                            inFileColumnIndex = col;
+                            audioColumnIndex = col;
                         }
                     }
 
-                    if (autoIdColumnIndex == -1 || inFileColumnIndex == -1)
+                    if (carpetaColumnIndex == -1 || especieColumnIndex == -1 || audioColumnIndex == -1)
                     {
-                        MessageBox.Show("No se encontraron columnas necesarias (AUTO ID o IN FILE) en el archivo Excel.");
+                        MessageBox.Show("No se encontraron columnas necesarias (PUNTO, AUTO ID* o IN FILE) en el archivo Excel.");
                         return;
                     }
 
-                    // Procesar las filas y filtrar según los criterios
+                    // Procesar las filas y crear instancias de Murcielago
                     for (int row = 2; row <= rowCount; row++) // Comenzamos desde la fila 2, asumiendo que la fila 1 son los encabezados
                     {
-                        string autoId = worksheet.Cells[row, autoIdColumnIndex].Text.Trim();
-                        string inFile = worksheet.Cells[row, inFileColumnIndex].Text.Trim();
+                        string carpeta = worksheet.Cells[row, carpetaColumnIndex].Text.Trim();
+                        string especie = worksheet.Cells[row, especieColumnIndex].Text.Trim();
+                        string audio = worksheet.Cells[row, audioColumnIndex].Text.Trim();
 
-                        if (!string.IsNullOrWhiteSpace(inFile) && autoId != "Noise")
+                        if (!string.IsNullOrWhiteSpace(audio) && especie != "Noise")
                         {
-                            fileNamesToCopy.Add(inFile);
+                            murcielagos.Add(new Murcielago
+                            {
+                                Carpeta = carpeta,
+                                Especie = especie,
+                                Audio = audio
+                            });
                         }
                     }
                 }
             }
 
             // Llamar a método para copiar archivos
-            CopyFilesToFolder(fileNamesToCopy);
+            CopyFilesToFolder(murcielagos);
         }
 
-        private void CopyFilesToFolder(List<string> fileNames)
+
+
+        private void CopyFilesToFolder(List<Murcielago> murcielagos)
         {
             // Seleccionar la carpeta de origen
             FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
@@ -93,45 +112,45 @@ namespace Project_ShortBat
                     Directory.CreateDirectory(destinationFolderPath);
                 }
 
-                // Iterar sobre cada archivo en fileNames
-                foreach (string fileName in fileNames)
+                // Actualizar visualmente el estado inicial en el RichTextBox para todos los murcielagos
+                int copiedFiles = 0;
+                int totalFiles = 0;
+                foreach (Murcielago murcielago in murcielagos)
                 {
-                    string[] foundFiles = Directory.GetFiles(sourceFolderPath, fileName, SearchOption.AllDirectories);
-
-                    // Actualizar visualmente el estado en el TextBox
-                    UpdateStatusRichTextBox(fileName, foundFiles.Length > 0);
-
-                    foreach (string foundFile in foundFiles)
+                    totalFiles++;
+                    string[] foundFiles = Directory.GetFiles(sourceFolderPath, murcielago.Audio, SearchOption.AllDirectories);
+                    if (foundFiles.Length > 0)
                     {
-                        string destinationFilePath = Path.Combine(destinationFolderPath, Path.GetFileName(foundFile));
-
-                        // Verificar si el archivo existe antes de copiarlo
-                        if (File.Exists(foundFile))
+                        foreach (string foundFile in foundFiles)
                         {
+                            string destinationFilePath = Path.Combine(destinationFolderPath, Path.GetFileName(foundFile));
+
                             try
                             {
                                 File.Copy(foundFile, destinationFilePath, true);
-                                UpdateStatusRichTextBox(fileName, true, true); // Marcar como encontrado (verde)
+                                UpdateStatusRichTextBox(murcielago.Audio, true, true); // Marcar como encontrado (verde)
+                                copiedFiles++;
                             }
                             catch (Exception ex)
                             {
                                 MessageBox.Show($"Error al copiar el archivo '{foundFile}': {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                UpdateStatusRichTextBox(fileName, true, false); // Marcar como error (rojo)
+                                UpdateStatusRichTextBox(murcielago.Audio, true, false); // Marcar como error (rojo)
                             }
                         }
-                        else
-                        {
-                            UpdateStatusRichTextBox(fileName, false, false); // Marcar como no encontrado (rojo)
-                        }
+                    }
+                    else
+                    {
+                        UpdateStatusRichTextBox(murcielago.Audio, false, false); // Marcar como no encontrado (gris)
                     }
                 }
-
-                MessageBox.Show("Archivos copiados correctamente a la carpeta 'patata' en el escritorio.");
+                MessageBox.Show(copiedFiles > 0 ? $"Se han copiado {copiedFiles} archivos de {totalFiles}." : "No se han encontrado archivos.");
             }
         }
-        private void UpdateStatusRichTextBox(string fileName, bool found, bool success = false)
+
+        private void UpdateStatusRichTextBox(string fileName, bool found, bool success)
         {
-            matrix.Invoke((MethodInvoker)delegate {
+            matrix.Invoke((MethodInvoker)delegate
+            {
                 matrix.SelectionStart = matrix.TextLength;
                 matrix.SelectionLength = 0;
 
@@ -160,5 +179,9 @@ namespace Project_ShortBat
             });
         }
 
+        private void checkSubCarpetas_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

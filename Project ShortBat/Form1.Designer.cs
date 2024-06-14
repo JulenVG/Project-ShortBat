@@ -30,6 +30,7 @@
         {
             loadExcel = new MaterialSkin.Controls.MaterialButton();
             matrix = new RichTextBox();
+            checkSubCarpetas = new CheckBox();
             SuspendLayout();
             // 
             // loadExcel
@@ -41,7 +42,7 @@
             loadExcel.Depth = 0;
             loadExcel.HighEmphasis = true;
             loadExcel.Icon = null;
-            loadExcel.Location = new Point(751, 794);
+            loadExcel.Location = new Point(438, 738);
             loadExcel.Margin = new Padding(4, 6, 4, 6);
             loadExcel.MouseState = MaterialSkin.MouseState.HOVER;
             loadExcel.Name = "loadExcel";
@@ -59,11 +60,21 @@
             matrix.BackColor = Color.Black;
             matrix.BorderStyle = BorderStyle.None;
             matrix.Location = new Point(953, 125);
-            matrix.Multiline = true;
             matrix.Name = "matrix";
             matrix.Size = new Size(567, 586);
             matrix.TabIndex = 1;
-            matrix.SelectionColor = Color.White;
+            matrix.Text = "";
+            // 
+            // checkSubCarpetas
+            // 
+            checkSubCarpetas.AutoSize = true;
+            checkSubCarpetas.Location = new Point(196, 316);
+            checkSubCarpetas.Name = "checkSubCarpetas";
+            checkSubCarpetas.Size = new Size(90, 19);
+            checkSubCarpetas.TabIndex = 2;
+            checkSubCarpetas.Text = "Subcarpetas";
+            checkSubCarpetas.UseVisualStyleBackColor = true;
+            checkSubCarpetas.CheckedChanged += checkSubCarpetas_CheckedChanged;
             // 
             // Form1
             // 
@@ -71,11 +82,11 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(64, 64, 64);
             ClientSize = new Size(1715, 876);
+            Controls.Add(checkSubCarpetas);
             Controls.Add(matrix);
             Controls.Add(loadExcel);
             Name = "Form1";
             Text = "Form1";
-            Load += Form1_Load;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -84,5 +95,6 @@
 
         private MaterialSkin.Controls.MaterialButton loadExcel;
         private RichTextBox matrix;
+        private CheckBox checkSubCarpetas;
     }
 }
