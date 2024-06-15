@@ -10,6 +10,7 @@ namespace Project_ShortBat
 {
     public partial class Form1 : MaterialForm
     {
+        private string destinationFolderPath;
         public Form1()
         {
             InitializeComponent();
@@ -17,8 +18,21 @@ namespace Project_ShortBat
             materialSkinManager.AddFormToManage(this);
             materialSkinManager.Theme = MaterialSkinManager.Themes.DARK;
             materialSkinManager.ColorScheme = new ColorScheme(Primary.Purple900, Primary.Grey900, Primary.Purple700, Accent.Purple700, TextShade.WHITE);
-        }
+            cantEspecies.Enabled = false;
+            enableLimit.Enabled = false;
 
+            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            destinationFolderPath = Path.Combine(desktopPath, "Output");
+        }
+        private void buttonSelectDestinationFolder_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
+            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+            {
+                destinationFolderPath = folderBrowserDialog.SelectedPath;
+                MessageBox.Show($"Carpeta de destino seleccionada: {destinationFolderPath}");
+            }
+        }
         private void buttonLoadExcel_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -26,11 +40,8 @@ namespace Project_ShortBat
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string filePath = openFileDialog.FileName;
+                matrix.Clear();
                 ProcessExcelFile(filePath);
-                if (checkSubCarpetas.Checked)
-                {
-
-                }
             }
         }
         private void ProcessExcelFile(string filePath)
@@ -108,28 +119,76 @@ namespace Project_ShortBat
             {
                 string sourceFolderPath = folderBrowserDialog.SelectedPath;
 
-                // Carpeta de destino (en el escritorio, por ejemplo)
-                string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                string destinationFolderPath = Path.Combine(desktopPath, "patata");
-
                 // Crear la carpeta de destino si no existe
                 if (!Directory.Exists(destinationFolderPath))
                 {
                     Directory.CreateDirectory(destinationFolderPath);
                 }
 
+                // Preparamos la barra de progreso
+                materialProgressBar1.Minimum = 0;
+                materialProgressBar1.Maximum = murcielagos.Count;
+                materialProgressBar1.Value = 0;
+
                 // Actualizar visualmente el estado inicial en el RichTextBox para todos los murcielagos
                 int copiedFiles = 0;
-                int totalFiles = 0;
+
+                // Verificar si el switch de especies está activado y obtener el valor del slider
+                bool useEspeciesLimit = especiesSwitch.Checked;
+                int especiesLimit = (int)cantEspecies.Value;
+
+                // Contadores para controlar la cantidad de murciélagos por especie
+                Dictionary<string, int> especiesCount = new Dictionary<string, int>();
+
                 foreach (Murcielago murcielago in murcielagos)
                 {
-                    totalFiles++;
+                    // Buscar archivos que coincidan con el nombre de audio del murciélago
                     string[] foundFiles = Directory.GetFiles(sourceFolderPath, murcielago.Audio, SearchOption.AllDirectories);
                     if (foundFiles.Length > 0)
                     {
                         foreach (string foundFile in foundFiles)
                         {
-                            string destinationFilePath = Path.Combine(destinationFolderPath, Path.GetFileName(foundFile));
+                            // Ruta inicial de la carpeta destino
+                            string subFolderPath = destinationFolderPath;
+
+                            // Verificar y ajustar la ruta según los checkboxes activos
+                            if (subFileSwitch.Checked)
+                            {
+                                subFolderPath = Path.Combine(destinationFolderPath, murcielago.Carpeta);
+                                if (!Directory.Exists(subFolderPath))
+                                {
+                                    Directory.CreateDirectory(subFolderPath);
+                                }
+                            }
+                            if (especiesSwitch.Checked)
+                            {
+                                subFolderPath = Path.Combine(subFolderPath, murcielago.Especie);
+                                if (!Directory.Exists(subFolderPath))
+                                {
+                                    Directory.CreateDirectory(subFolderPath);
+                                }
+                            }
+
+                            if (useEspeciesLimit && especiesSwitch.Checked && enableLimit.Checked)
+                            {
+                                // Verificar límite de especies por carpeta
+                                if (!especiesCount.ContainsKey(murcielago.Especie))
+                                {
+                                    especiesCount[murcielago.Especie] = 0;
+                                }
+
+                                if (especiesCount[murcielago.Especie] >= especiesLimit)
+                                {
+                                    // Superó el límite, no copiar más archivos para esta especie
+                                    UpdateStatusRichTextBox(murcielago.Audio, true, false); // Marcar como error (rojo)
+                                    continue;
+                                }
+
+                                // Incrementar contador de especie
+                                especiesCount[murcielago.Especie]++;
+                            }
+
+                            string destinationFilePath = Path.Combine(subFolderPath, Path.GetFileName(foundFile));
 
                             try
                             {
@@ -137,7 +196,7 @@ namespace Project_ShortBat
                                 UpdateStatusRichTextBox(murcielago.Audio, true, true); // Marcar como encontrado (verde)
                                 copiedFiles++;
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
                                 UpdateStatusRichTextBox(murcielago.Audio, true, false); // Marcar como error (rojo)
                             }
@@ -147,8 +206,10 @@ namespace Project_ShortBat
                     {
                         UpdateStatusRichTextBox(murcielago.Audio, false, false); // Marcar como no encontrado (gris)
                     }
+                    // Aumentamos la barra de progreso
+                    materialProgressBar1.Value = Math.Min(materialProgressBar1.Value + 1, materialProgressBar1.Maximum);
                 }
-                MessageBox.Show(copiedFiles > 0 ? $"Se han copiado {copiedFiles} archivos de {totalFiles}." : "No se han encontrado archivos.");
+                MessageBox.Show(copiedFiles > 0 ? $"Se han copiado {copiedFiles} archivos de {murcielagos.Count}." : "No se han encontrado archivos.");
             }
         }
 
@@ -195,6 +256,17 @@ namespace Project_ShortBat
                 matrix.SelectionStart = matrix.Text.Length;
                 matrix.ScrollToCaret();
             });
+        }
+
+        private void especiesSwitch_CheckedChanged(object sender, EventArgs e)
+        {
+            enableLimit.Enabled = !enableLimit.Enabled;
+            enableLimit.Checked = false;
+        }
+
+        private void enableLimit_CheckedChanged(object sender, EventArgs e)
+        {
+            cantEspecies.Enabled = !cantEspecies.Enabled;
         }
     }
 }
