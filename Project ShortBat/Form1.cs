@@ -3,14 +3,20 @@ using Project_ShortBat.Models;
 using System.IO;
 using System.Windows.Forms.VisualStyles;
 using Project_ShortBat.Models;
+using MaterialSkin;
+using MaterialSkin.Controls;
 
 namespace Project_ShortBat
 {
-    public partial class Form1 : Form
+    public partial class Form1 : MaterialForm
     {
         public Form1()
         {
             InitializeComponent();
+            var materialSkinManager = MaterialSkinManager.Instance;
+            materialSkinManager.AddFormToManage(this);
+            materialSkinManager.Theme = MaterialSkinManager.Themes.DARK;
+            materialSkinManager.ColorScheme = new ColorScheme(Primary.Purple900, Primary.Grey900, Primary.Purple700, Accent.Purple700, TextShade.WHITE);
         }
 
         private void buttonLoadExcel_Click(object sender, EventArgs e)
@@ -21,8 +27,8 @@ namespace Project_ShortBat
             {
                 string filePath = openFileDialog.FileName;
                 ProcessExcelFile(filePath);
-                if (checkSubCarpetas.Checked) 
-                { 
+                if (checkSubCarpetas.Checked)
+                {
 
                 }
             }
@@ -133,7 +139,6 @@ namespace Project_ShortBat
                             }
                             catch (Exception ex)
                             {
-                                MessageBox.Show($"Error al copiar el archivo '{foundFile}': {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 UpdateStatusRichTextBox(murcielago.Audio, true, false); // Marcar como error (rojo)
                             }
                         }
@@ -153,35 +158,43 @@ namespace Project_ShortBat
             {
                 matrix.SelectionStart = matrix.TextLength;
                 matrix.SelectionLength = 0;
+                matrix.SelectionFont = new Font("Cascadia Code SemiBold", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
 
                 if (found)
                 {
                     if (success)
                     {
-                        matrix.SelectionColor = Color.Green;
-                        matrix.AppendText(fileName + " OK" + Environment.NewLine);
+                        matrix.SelectionColor = Color.FromArgb(165, 127, 248);
+                        matrix.AppendText(fileName);
+                        matrix.SelectionColor = Color.FromArgb(165, 107, 196);
+                        matrix.AppendText(" \u2192");
+                        matrix.SelectionColor = Color.FromArgb(0, 255, 127);
+                        matrix.AppendText(" Archivo copiado con éxito" + Environment.NewLine);
                     }
                     else
                     {
-                        matrix.SelectionColor = Color.Red;
-                        matrix.AppendText(fileName + " KO" + Environment.NewLine);
+                        matrix.SelectionColor = Color.FromArgb(165, 127, 248);
+                        matrix.AppendText(fileName);
+                        matrix.SelectionColor = Color.FromArgb(165, 107, 196);
+                        matrix.AppendText(" \u2192");
+                        matrix.SelectionColor = Color.FromArgb(217, 108, 104);
+                        matrix.AppendText(" KO \u2715" + Environment.NewLine);
                     }
                 }
                 else
                 {
-                    matrix.SelectionColor = Color.Gray;
-                    matrix.AppendText(fileName + " No encontrado" + Environment.NewLine);
+                    matrix.SelectionColor = Color.FromArgb(165, 127, 248);
+                    matrix.AppendText(fileName);
+                    matrix.SelectionColor = Color.FromArgb(165, 107, 196);
+                    matrix.AppendText(" \u2192");
+                    matrix.SelectionColor = Color.FromArgb(255, 99, 71);
+                    matrix.AppendText(" Archivo no encontrado" + Environment.NewLine);
                 }
 
                 matrix.SelectionColor = matrix.ForeColor; // Reset color
                 matrix.SelectionStart = matrix.Text.Length;
                 matrix.ScrollToCaret();
             });
-        }
-
-        private void checkSubCarpetas_CheckedChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }
