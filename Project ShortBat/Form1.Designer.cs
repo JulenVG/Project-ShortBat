@@ -32,6 +32,7 @@
             loadExcel = new MaterialSkin.Controls.MaterialButton();
             matrix = new RichTextBox();
             materialCard1 = new MaterialSkin.Controls.MaterialCard();
+            pictureBox1 = new PictureBox();
             materialProgressBar1 = new MaterialSkin.Controls.MaterialProgressBar();
             subFileSwitch = new MaterialSkin.Controls.MaterialSwitch();
             especiesSwitch = new MaterialSkin.Controls.MaterialSwitch();
@@ -41,8 +42,11 @@
             materialLabel1 = new MaterialSkin.Controls.MaterialLabel();
             buttonSelectDestinationFolder = new Button();
             versionLabel = new MaterialSkin.Controls.MaterialLabel();
+            pictureBox2 = new PictureBox();
             materialCard1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             materialCard2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             SuspendLayout();
             // 
             // loadExcel
@@ -72,10 +76,10 @@
             matrix.BackColor = Color.FromArgb(255, 255, 128);
             matrix.BorderStyle = BorderStyle.None;
             matrix.Font = new Font("Cascadia Code SemiBold", 20F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            matrix.Location = new Point(17, 17);
+            matrix.Location = new Point(49, 17);
             matrix.Name = "matrix";
             matrix.ReadOnly = true;
-            matrix.Size = new Size(561, 587);
+            matrix.Size = new Size(529, 587);
             matrix.TabIndex = 1;
             matrix.Text = "";
             // 
@@ -83,6 +87,7 @@
             // 
             materialCard1.BackColor = Color.FromArgb(255, 255, 255);
             materialCard1.Controls.Add(matrix);
+            materialCard1.Controls.Add(pictureBox1);
             materialCard1.Depth = 0;
             materialCard1.ForeColor = Color.FromArgb(222, 0, 0, 0);
             materialCard1.Location = new Point(321, 110);
@@ -92,6 +97,17 @@
             materialCard1.Padding = new Padding(14);
             materialCard1.Size = new Size(595, 621);
             materialCard1.TabIndex = 3;
+            // 
+            // pictureBox1
+            // 
+            pictureBox1.BackColor = Color.Transparent;
+            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
+            pictureBox1.Location = new Point(-158, 319);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(212, 229);
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox1.TabIndex = 11;
+            pictureBox1.TabStop = false;
             // 
             // materialProgressBar1
             // 
@@ -219,25 +235,40 @@
             versionLabel.TabIndex = 10;
             versionLabel.Text = "materialLabel2";
             // 
+            // pictureBox2
+            // 
+            pictureBox2.BackColor = Color.Transparent;
+            pictureBox2.Image = (Image)resources.GetObject("pictureBox2.Image");
+            pictureBox2.Location = new Point(162, 429);
+            pictureBox2.Name = "pictureBox2";
+            pictureBox2.Size = new Size(212, 229);
+            pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox2.TabIndex = 12;
+            pictureBox2.TabStop = false;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(64, 64, 64);
             ClientSize = new Size(966, 766);
+            Controls.Add(materialCard1);
+            Controls.Add(pictureBox2);
             Controls.Add(versionLabel);
             Controls.Add(buttonSelectDestinationFolder);
             Controls.Add(materialCard2);
             Controls.Add(materialProgressBar1);
             Controls.Add(loadExcel);
-            Controls.Add(materialCard1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "Form1";
             Sizable = false;
             Text = "ShortBat";
             materialCard1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             materialCard2.ResumeLayout(false);
             materialCard2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -256,5 +287,7 @@
         private MaterialSkin.Controls.MaterialSwitch enableLimit;
         private Button buttonSelectDestinationFolder;
         private MaterialSkin.Controls.MaterialLabel versionLabel;
+        private PictureBox pictureBox1;
+        private PictureBox pictureBox2;
     }
 }
