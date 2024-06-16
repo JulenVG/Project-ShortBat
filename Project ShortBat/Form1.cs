@@ -5,6 +5,8 @@ using System.Windows.Forms.VisualStyles;
 using Project_ShortBat.Models;
 using MaterialSkin;
 using MaterialSkin.Controls;
+using System.Reflection;
+using MethodInvoker = System.Windows.Forms.MethodInvoker;
 
 namespace Project_ShortBat
 {
@@ -20,6 +22,9 @@ namespace Project_ShortBat
             materialSkinManager.ColorScheme = new ColorScheme(Primary.Purple900, Primary.Grey900, Primary.Purple700, Accent.Purple700, TextShade.WHITE);
             cantEspecies.Enabled = false;
             enableLimit.Enabled = false;
+
+            string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            versionLabel.Text = $"Ver. {version}";
 
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             destinationFolderPath = Path.Combine(desktopPath, "Output");
@@ -113,107 +118,149 @@ namespace Project_ShortBat
 
         private void CopyFilesToFolder(List<Murcielago> murcielagos)
         {
-            // Seleccionar la carpeta de origen
-            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
-            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+            string sourceFolderPath = SelectSourceFolder();
+            if (sourceFolderPath == null)
             {
-                string sourceFolderPath = folderBrowserDialog.SelectedPath;
+                return; // Salir si no se seleccionó una carpeta de origen
+            }
 
-                // Crear la carpeta de destino si no existe
-                if (!Directory.Exists(destinationFolderPath))
+            CreateDestinationFolder();
+
+            PrepareProgressBar(murcielagos.Count);
+
+            Dictionary<string, int> especiesCount = new Dictionary<string, int>();
+
+            int copiedFiles = 0;
+
+            foreach (Murcielago murcielago in murcielagos)
+            {
+                string[] foundFiles = Directory.GetFiles(sourceFolderPath, murcielago.Audio, SearchOption.AllDirectories);
+                if (foundFiles.Length > 0)
                 {
-                    Directory.CreateDirectory(destinationFolderPath);
-                }
-
-                // Preparamos la barra de progreso
-                materialProgressBar1.Minimum = 0;
-                materialProgressBar1.Maximum = murcielagos.Count;
-                materialProgressBar1.Value = 0;
-
-                // Actualizar visualmente el estado inicial en el RichTextBox para todos los murcielagos
-                int copiedFiles = 0;
-
-                // Verificar si el switch de especies está activado y obtener el valor del slider
-                bool useEspeciesLimit = especiesSwitch.Checked;
-                int especiesLimit = (int)cantEspecies.Value;
-
-                // Contadores para controlar la cantidad de murciélagos por especie
-                Dictionary<string, int> especiesCount = new Dictionary<string, int>();
-
-                foreach (Murcielago murcielago in murcielagos)
-                {
-                    // Buscar archivos que coincidan con el nombre de audio del murciélago
-                    string[] foundFiles = Directory.GetFiles(sourceFolderPath, murcielago.Audio, SearchOption.AllDirectories);
-                    if (foundFiles.Length > 0)
+                    foreach (string foundFile in foundFiles)
                     {
-                        foreach (string foundFile in foundFiles)
+                        string subFolderPath = GetSubFolderPath(murcielago);
+
+                        if (IsExceedingSpeciesLimit(murcielago, especiesCount))
                         {
-                            // Ruta inicial de la carpeta destino
-                            string subFolderPath = destinationFolderPath;
+                            UpdateStatusRichTextBox(murcielago.Audio, true, true, true);
+                            continue;
+                        }
 
-                            // Verificar y ajustar la ruta según los checkboxes activos
-                            if (subFileSwitch.Checked)
-                            {
-                                subFolderPath = Path.Combine(destinationFolderPath, murcielago.Carpeta);
-                                if (!Directory.Exists(subFolderPath))
-                                {
-                                    Directory.CreateDirectory(subFolderPath);
-                                }
-                            }
-                            if (especiesSwitch.Checked)
-                            {
-                                subFolderPath = Path.Combine(subFolderPath, murcielago.Especie);
-                                if (!Directory.Exists(subFolderPath))
-                                {
-                                    Directory.CreateDirectory(subFolderPath);
-                                }
-                            }
+                        string destinationFilePath = Path.Combine(subFolderPath, Path.GetFileName(foundFile));
 
-                            if (useEspeciesLimit && especiesSwitch.Checked && enableLimit.Checked)
-                            {
-                                // Verificar límite de especies por carpeta
-                                if (!especiesCount.ContainsKey(murcielago.Especie))
-                                {
-                                    especiesCount[murcielago.Especie] = 0;
-                                }
-
-                                if (especiesCount[murcielago.Especie] >= especiesLimit)
-                                {
-                                    // Superó el límite, no copiar más archivos para esta especie
-                                    UpdateStatusRichTextBox(murcielago.Audio, true, false); // Marcar como error (rojo)
-                                    continue;
-                                }
-
-                                // Incrementar contador de especie
-                                especiesCount[murcielago.Especie]++;
-                            }
-
-                            string destinationFilePath = Path.Combine(subFolderPath, Path.GetFileName(foundFile));
-
-                            try
-                            {
-                                File.Copy(foundFile, destinationFilePath, true);
-                                UpdateStatusRichTextBox(murcielago.Audio, true, true); // Marcar como encontrado (verde)
-                                copiedFiles++;
-                            }
-                            catch (Exception)
-                            {
-                                UpdateStatusRichTextBox(murcielago.Audio, true, false); // Marcar como error (rojo)
-                            }
+                        try
+                        {
+                            File.Copy(foundFile, destinationFilePath, true);
+                            UpdateSpeciesCount(murcielago, especiesCount);
+                            UpdateStatusRichTextBox(murcielago.Audio, true, true);
+                            copiedFiles++;
+                        }
+                        catch (Exception)
+                        {
+                            UpdateStatusRichTextBox(murcielago.Audio, true, false);
                         }
                     }
-                    else
-                    {
-                        UpdateStatusRichTextBox(murcielago.Audio, false, false); // Marcar como no encontrado (gris)
-                    }
-                    // Aumentamos la barra de progreso
-                    materialProgressBar1.Value = Math.Min(materialProgressBar1.Value + 1, materialProgressBar1.Maximum);
                 }
-                MessageBox.Show(copiedFiles > 0 ? $"Se han copiado {copiedFiles} archivos de {murcielagos.Count}." : "No se han encontrado archivos.");
+                else
+                {
+                    UpdateStatusRichTextBox(murcielago.Audio, false, false);
+                }
+
+                materialProgressBar1.Value = Math.Min(materialProgressBar1.Value + 1, materialProgressBar1.Maximum);
+            }
+
+            MessageBox.Show(copiedFiles > 0 ? $"Se han copiado {copiedFiles} archivos de {murcielagos.Count}." : "No se han encontrado archivos.");
+        }
+
+        private string SelectSourceFolder()
+        {
+            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            {
+                if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+                {
+                    return folderBrowserDialog.SelectedPath;
+                }
+            }
+            return null;
+        }
+
+        private void CreateDestinationFolder()
+        {
+            if (!Directory.Exists(destinationFolderPath))
+            {
+                Directory.CreateDirectory(destinationFolderPath);
             }
         }
 
-        private void UpdateStatusRichTextBox(string fileName, bool found, bool success)
+        private void PrepareProgressBar(int itemCount)
+        {
+            materialProgressBar1.Minimum = 0;
+            materialProgressBar1.Maximum = itemCount;
+            materialProgressBar1.Value = 0;
+        }
+
+        private string GetSubFolderPath(Murcielago murcielago)
+        {
+            string subFolderPath = destinationFolderPath;
+
+            if (subFileSwitch.Checked)
+            {
+                subFolderPath = Path.Combine(destinationFolderPath, murcielago.Carpeta);
+                if (!Directory.Exists(subFolderPath))
+                {
+                    Directory.CreateDirectory(subFolderPath);
+                }
+            }
+
+            if (especiesSwitch.Checked)
+            {
+                subFolderPath = Path.Combine(subFolderPath, murcielago.Especie);
+                if (!Directory.Exists(subFolderPath))
+                {
+                    Directory.CreateDirectory(subFolderPath);
+                }
+            }
+
+            return subFolderPath;
+        }
+
+        private bool IsExceedingSpeciesLimit(Murcielago murcielago, Dictionary<string, int> especiesCount)
+        {
+            if (!especiesSwitch.Checked || !enableLimit.Checked)
+            {
+                return false;
+            }
+
+            string key = subFileSwitch.Checked ? $"{murcielago.Especie}-{murcielago.Carpeta}" : murcielago.Especie;
+
+            if (!especiesCount.ContainsKey(key))
+            {
+                especiesCount[key] = 0;
+            }
+
+            if (especiesCount[key] >= cantEspecies.Value)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private void UpdateSpeciesCount(Murcielago murcielago, Dictionary<string, int> especiesCount)
+        {
+            if (!especiesSwitch.Checked || !enableLimit.Checked)
+            {
+                return;
+            }
+
+            string key = subFileSwitch.Checked ? $"{murcielago.Especie}-{murcielago.Carpeta}" : murcielago.Especie;
+
+            especiesCount[key]++;
+        }
+
+
+        private void UpdateStatusRichTextBox(string fileName, bool found, bool success, bool limit = false)
         {
             matrix.Invoke((MethodInvoker)delegate
             {
@@ -221,42 +268,51 @@ namespace Project_ShortBat
                 matrix.SelectionLength = 0;
                 matrix.SelectionFont = new Font("Cascadia Code SemiBold", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
 
-                if (found)
+                // Configuración de colores predeterminada
+                Color fileNameColor = Color.FromArgb(165, 127, 248);
+                Color arrowColor = Color.FromArgb(165, 107, 196);
+                Color messageColor;
+                string message;
+
+                if (limit)
+                {
+                    messageColor = Color.FromArgb(255, 165, 0);
+                    message = " Límite de especie alcanzado";
+                }
+                else if (found)
                 {
                     if (success)
                     {
-                        matrix.SelectionColor = Color.FromArgb(165, 127, 248);
-                        matrix.AppendText(fileName);
-                        matrix.SelectionColor = Color.FromArgb(165, 107, 196);
-                        matrix.AppendText(" \u2192");
-                        matrix.SelectionColor = Color.FromArgb(0, 255, 127);
-                        matrix.AppendText(" Archivo copiado con éxito" + Environment.NewLine);
+                        messageColor = Color.FromArgb(0, 255, 127);
+                        message = " Archivo copiado con éxito";
                     }
                     else
                     {
-                        matrix.SelectionColor = Color.FromArgb(165, 127, 248);
-                        matrix.AppendText(fileName);
-                        matrix.SelectionColor = Color.FromArgb(165, 107, 196);
-                        matrix.AppendText(" \u2192");
-                        matrix.SelectionColor = Color.FromArgb(217, 108, 104);
-                        matrix.AppendText(" KO \u2715" + Environment.NewLine);
+                        messageColor = Color.FromArgb(217, 108, 104);
+                        message = " Error al copiar el archivo \u2715";
                     }
                 }
                 else
                 {
-                    matrix.SelectionColor = Color.FromArgb(165, 127, 248);
-                    matrix.AppendText(fileName);
-                    matrix.SelectionColor = Color.FromArgb(165, 107, 196);
-                    matrix.AppendText(" \u2192");
-                    matrix.SelectionColor = Color.FromArgb(255, 99, 71);
-                    matrix.AppendText(" Archivo no encontrado" + Environment.NewLine);
+                    messageColor = Color.FromArgb(255, 99, 71);
+                    message = " Archivo no encontrado";
                 }
 
-                matrix.SelectionColor = matrix.ForeColor; // Reset color
+                // Aplicar colores y texto
+                matrix.SelectionColor = fileNameColor;
+                matrix.AppendText(fileName);
+                matrix.SelectionColor = arrowColor;
+                matrix.AppendText(" \u2192");
+                matrix.SelectionColor = messageColor;
+                matrix.AppendText(message + Environment.NewLine);
+
+                // Restablecer color y desplazar caret
+                matrix.SelectionColor = matrix.ForeColor;
                 matrix.SelectionStart = matrix.Text.Length;
                 matrix.ScrollToCaret();
             });
         }
+
 
         private void especiesSwitch_CheckedChanged(object sender, EventArgs e)
         {

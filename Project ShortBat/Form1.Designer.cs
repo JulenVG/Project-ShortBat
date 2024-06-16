@@ -40,6 +40,7 @@
             cantEspecies = new MaterialSkin.Controls.MaterialSlider();
             materialLabel1 = new MaterialSkin.Controls.MaterialLabel();
             buttonSelectDestinationFolder = new Button();
+            versionLabel = new MaterialSkin.Controls.MaterialLabel();
             materialCard1.SuspendLayout();
             materialCard2.SuspendLayout();
             SuspendLayout();
@@ -111,9 +112,9 @@
             subFileSwitch.MouseState = MaterialSkin.MouseState.HOVER;
             subFileSwitch.Name = "subFileSwitch";
             subFileSwitch.Ripple = true;
-            subFileSwitch.Size = new Size(147, 37);
+            subFileSwitch.Size = new Size(135, 37);
             subFileSwitch.TabIndex = 7;
-            subFileSwitch.Text = "Subcarpetas";
+            subFileSwitch.Text = "Estaciones";
             subFileSwitch.UseVisualStyleBackColor = true;
             // 
             // especiesSwitch
@@ -204,12 +205,27 @@
             buttonSelectDestinationFolder.UseVisualStyleBackColor = true;
             buttonSelectDestinationFolder.Click += buttonSelectDestinationFolder_Click;
             // 
+            // versionLabel
+            // 
+            versionLabel.AutoSize = true;
+            versionLabel.Depth = 0;
+            versionLabel.Font = new Font("Roboto", 10F, FontStyle.Regular, GraphicsUnit.Pixel);
+            versionLabel.FontType = MaterialSkin.MaterialSkinManager.fontType.Overline;
+            versionLabel.ForeColor = SystemColors.ControlText;
+            versionLabel.Location = new Point(903, 744);
+            versionLabel.MouseState = MaterialSkin.MouseState.HOVER;
+            versionLabel.Name = "versionLabel";
+            versionLabel.Size = new Size(64, 13);
+            versionLabel.TabIndex = 10;
+            versionLabel.Text = "materialLabel2";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(64, 64, 64);
             ClientSize = new Size(966, 766);
+            Controls.Add(versionLabel);
             Controls.Add(buttonSelectDestinationFolder);
             Controls.Add(materialCard2);
             Controls.Add(materialProgressBar1);
@@ -218,7 +234,7 @@
             MaximizeBox = false;
             Name = "Form1";
             Sizable = false;
-            Text = "Form1";
+            Text = "ShortBat";
             materialCard1.ResumeLayout(false);
             materialCard2.ResumeLayout(false);
             materialCard2.PerformLayout();
@@ -239,5 +255,6 @@
         private MaterialSkin.Controls.MaterialSlider cantEspecies;
         private MaterialSkin.Controls.MaterialSwitch enableLimit;
         private Button buttonSelectDestinationFolder;
+        private MaterialSkin.Controls.MaterialLabel versionLabel;
     }
 }
