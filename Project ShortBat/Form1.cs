@@ -20,8 +20,10 @@ namespace Project_ShortBat
             materialSkinManager.AddFormToManage(this);
             materialSkinManager.Theme = MaterialSkinManager.Themes.DARK;
             materialSkinManager.ColorScheme = new ColorScheme(Primary.Purple900, Primary.Grey900, Primary.Purple700, Accent.Purple700, TextShade.WHITE);
+
             cantEspecies.Enabled = false;
             enableLimit.Enabled = false;
+            subFileSwitch.Checked = true;
 
             string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             versionLabel.Text = $"Ver. {version}";
