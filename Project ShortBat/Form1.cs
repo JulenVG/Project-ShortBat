@@ -153,7 +153,7 @@ namespace Project_ShortBat
 
                         try
                         {
-                            File.Copy(foundFile, destinationFilePath, true);
+                            File.Copy(foundFile, destinationFilePath);
                             UpdateSpeciesCount(murcielago, especiesCount);
                             UpdateStatusRichTextBox(murcielago.Audio, true, true);
                             copiedFiles++;
@@ -291,7 +291,7 @@ namespace Project_ShortBat
                     else
                     {
                         messageColor = Color.FromArgb(217, 108, 104);
-                        message = " Error al copiar el archivo \u2715";
+                        message = " Archivo repetido";
                     }
                 }
                 else
