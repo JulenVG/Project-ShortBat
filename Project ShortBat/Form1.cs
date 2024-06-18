@@ -24,6 +24,7 @@ namespace Project_ShortBat
             cantEspecies.Enabled = false;
             enableLimit.Enabled = false;
             subFileSwitch.Checked = true;
+            dispositiveSwitch.Checked = true;
 
             string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             versionLabel.Text = $"Ver. {version}";
@@ -67,6 +68,7 @@ namespace Project_ShortBat
                     int carpetaColumnIndex = -1;
                     int especieColumnIndex = -1;
                     int audioColumnIndex = -1;
+                    int dispositivoColumnIndex = -1;
 
                     // Encuentra los índices de columna para "PUNTO", "AUTO ID*" y "IN FILE"
                     for (int col = 1; col <= colCount; col++)
@@ -84,9 +86,13 @@ namespace Project_ShortBat
                         {
                             audioColumnIndex = col;
                         }
+                        else if (columnName == "DISPOSITIVO")
+                        {
+                            dispositivoColumnIndex = col;
+                        }
                     }
 
-                    if (carpetaColumnIndex == -1 || especieColumnIndex == -1 || audioColumnIndex == -1)
+                    if (carpetaColumnIndex == -1 || especieColumnIndex == -1 || audioColumnIndex == -1 || dispositivoColumnIndex == -1)
                     {
                         MessageBox.Show("No se encontraron columnas necesarias (PUNTO, AUTO ID* o IN FILE) en el archivo Excel.");
                         return;
@@ -98,6 +104,7 @@ namespace Project_ShortBat
                         string carpeta = worksheet.Cells[row, carpetaColumnIndex].Text.Trim();
                         string especie = worksheet.Cells[row, especieColumnIndex].Text.Trim();
                         string audio = worksheet.Cells[row, audioColumnIndex].Text.Trim();
+                        string dispositivo = worksheet.Cells[row, dispositivoColumnIndex].Text.Trim();
 
                         if (!string.IsNullOrWhiteSpace(audio) && especie != "Noise")
                         {
@@ -105,7 +112,8 @@ namespace Project_ShortBat
                             {
                                 Carpeta = carpeta,
                                 Especie = especie,
-                                Audio = audio
+                                Audio = audio,
+                                Dispositivo = dispositivo
                             });
                         }
                     }
@@ -209,6 +217,15 @@ namespace Project_ShortBat
             if (subFileSwitch.Checked)
             {
                 subFolderPath = Path.Combine(destinationFolderPath, murcielago.Carpeta);
+                if (!Directory.Exists(subFolderPath))
+                {
+                    Directory.CreateDirectory(subFolderPath);
+                }
+            }
+
+            if (dispositiveSwitch.Checked)
+            {
+                subFolderPath = Path.Combine(subFolderPath, murcielago.Dispositivo);
                 if (!Directory.Exists(subFolderPath))
                 {
                     Directory.CreateDirectory(subFolderPath);

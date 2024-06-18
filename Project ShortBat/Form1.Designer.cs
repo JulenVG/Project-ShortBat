@@ -37,6 +37,7 @@
             subFileSwitch = new MaterialSkin.Controls.MaterialSwitch();
             especiesSwitch = new MaterialSkin.Controls.MaterialSwitch();
             materialCard2 = new MaterialSkin.Controls.MaterialCard();
+            dispositiveSwitch = new MaterialSkin.Controls.MaterialSwitch();
             enableLimit = new MaterialSkin.Controls.MaterialSwitch();
             cantEspecies = new MaterialSkin.Controls.MaterialSlider();
             materialLabel1 = new MaterialSkin.Controls.MaterialLabel();
@@ -58,7 +59,7 @@
             loadExcel.Depth = 0;
             loadExcel.HighEmphasis = true;
             loadExcel.Icon = null;
-            loadExcel.Location = new Point(72, 337);
+            loadExcel.Location = new Point(70, 373);
             loadExcel.Margin = new Padding(4, 6, 4, 6);
             loadExcel.MouseState = MaterialSkin.MouseState.HOVER;
             loadExcel.Name = "loadExcel";
@@ -115,7 +116,7 @@
             materialProgressBar1.Location = new Point(0, 760);
             materialProgressBar1.MouseState = MaterialSkin.MouseState.HOVER;
             materialProgressBar1.Name = "materialProgressBar1";
-            materialProgressBar1.Size = new Size(1003, 5);
+            materialProgressBar1.Size = new Size(967, 5);
             materialProgressBar1.TabIndex = 7;
             // 
             // subFileSwitch
@@ -137,7 +138,7 @@
             // 
             especiesSwitch.AutoSize = true;
             especiesSwitch.Depth = 0;
-            especiesSwitch.Location = new Point(14, 81);
+            especiesSwitch.Location = new Point(14, 118);
             especiesSwitch.Margin = new Padding(0);
             especiesSwitch.MouseLocation = new Point(-1, -1);
             especiesSwitch.MouseState = MaterialSkin.MouseState.HOVER;
@@ -152,6 +153,7 @@
             // materialCard2
             // 
             materialCard2.BackColor = Color.FromArgb(255, 255, 255);
+            materialCard2.Controls.Add(dispositiveSwitch);
             materialCard2.Controls.Add(enableLimit);
             materialCard2.Controls.Add(cantEspecies);
             materialCard2.Controls.Add(materialLabel1);
@@ -164,14 +166,30 @@
             materialCard2.MouseState = MaterialSkin.MouseState.HOVER;
             materialCard2.Name = "materialCard2";
             materialCard2.Padding = new Padding(14);
-            materialCard2.Size = new Size(256, 207);
+            materialCard2.Size = new Size(256, 249);
             materialCard2.TabIndex = 8;
+            // 
+            // dispositiveSwitch
+            // 
+            dispositiveSwitch.AutoSize = true;
+            dispositiveSwitch.Depth = 0;
+            dispositiveSwitch.ImageAlign = ContentAlignment.BottomLeft;
+            dispositiveSwitch.Location = new Point(14, 81);
+            dispositiveSwitch.Margin = new Padding(0);
+            dispositiveSwitch.MouseLocation = new Point(-1, -1);
+            dispositiveSwitch.MouseState = MaterialSkin.MouseState.HOVER;
+            dispositiveSwitch.Name = "dispositiveSwitch";
+            dispositiveSwitch.Ripple = true;
+            dispositiveSwitch.Size = new Size(137, 37);
+            dispositiveSwitch.TabIndex = 12;
+            dispositiveSwitch.Text = "Dispositivo";
+            dispositiveSwitch.UseVisualStyleBackColor = true;
             // 
             // enableLimit
             // 
             enableLimit.AutoSize = true;
             enableLimit.Depth = 0;
-            enableLimit.Location = new Point(14, 118);
+            enableLimit.Location = new Point(14, 155);
             enableLimit.Margin = new Padding(0);
             enableLimit.MouseLocation = new Point(-1, -1);
             enableLimit.MouseState = MaterialSkin.MouseState.HOVER;
@@ -187,7 +205,7 @@
             // 
             cantEspecies.Depth = 0;
             cantEspecies.ForeColor = Color.FromArgb(222, 0, 0, 0);
-            cantEspecies.Location = new Point(2, 158);
+            cantEspecies.Location = new Point(2, 195);
             cantEspecies.MouseState = MaterialSkin.MouseState.HOVER;
             cantEspecies.Name = "cantEspecies";
             cantEspecies.Size = new Size(237, 40);
@@ -214,7 +232,7 @@
             buttonSelectDestinationFolder.BackgroundImageLayout = ImageLayout.Zoom;
             buttonSelectDestinationFolder.FlatAppearance.BorderSize = 0;
             buttonSelectDestinationFolder.FlatStyle = FlatStyle.Flat;
-            buttonSelectDestinationFolder.Location = new Point(214, 337);
+            buttonSelectDestinationFolder.Location = new Point(212, 373);
             buttonSelectDestinationFolder.Name = "buttonSelectDestinationFolder";
             buttonSelectDestinationFolder.Size = new Size(62, 36);
             buttonSelectDestinationFolder.TabIndex = 9;
@@ -289,5 +307,6 @@
         private MaterialSkin.Controls.MaterialLabel versionLabel;
         private PictureBox pictureBox1;
         private PictureBox pictureBox2;
+        private MaterialSkin.Controls.MaterialSwitch dispositiveSwitch;
     }
 }

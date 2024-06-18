@@ -11,5 +11,6 @@ namespace Project_ShortBat.Models
         public string Carpeta { get; set; }
         public string Especie { get; set; }
         public string Audio { get; set; }
+        public string Dispositivo { get; set; }
     }
 }
