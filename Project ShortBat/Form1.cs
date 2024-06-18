@@ -1,12 +1,18 @@
+using CsvHelper;
+using CsvHelper.Configuration;
 using OfficeOpenXml;
 using Project_ShortBat.Models;
+using System.Globalization;
 using System.IO;
-using System.Windows.Forms.VisualStyles;
-using Project_ShortBat.Models;
+using System.Linq;
+using System.Windows.Forms;
 using MaterialSkin;
 using MaterialSkin.Controls;
 using System.Reflection;
 using MethodInvoker = System.Windows.Forms.MethodInvoker;
+using System.Collections.Generic;
+using System.Data;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Project_ShortBat
 {
@@ -32,6 +38,7 @@ namespace Project_ShortBat
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             destinationFolderPath = Path.Combine(desktopPath, "Output");
         }
+
         private void buttonSelectDestinationFolder_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
@@ -39,6 +46,19 @@ namespace Project_ShortBat
             {
                 destinationFolderPath = folderBrowserDialog.SelectedPath;
                 MessageBox.Show($"Carpeta de destino seleccionada: {destinationFolderPath}");
+            }
+        }
+
+        private void loadCSV_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "CSV Files|*.csv";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string filePath = openFileDialog.FileName;
+                matrix.Clear();
+
+                ProcessCsvFile(filePath);
             }
         }
         private void buttonLoadExcel_Click(object sender, EventArgs e)
@@ -52,6 +72,69 @@ namespace Project_ShortBat
                 ProcessExcelFile(filePath);
             }
         }
+
+        private void ProcessCsvFile(string filePath)
+        {
+            DataTable dataTable = new DataTable();
+
+            // Leer CSV
+            using (var reader = new StreamReader(filePath))
+            using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                Delimiter = ","
+            }))
+            {
+                using (var dr = new CsvDataReader(csv))
+                {
+                    dataTable.Load(dr);
+                }
+            }
+
+            // Dividir la columna FOLDER en dos columnas
+            if (dataTable.Columns.Contains("FOLDER"))
+            {
+                int inFileColumnIndex = dataTable.Columns["FOLDER"].Ordinal;
+
+
+                dataTable.Columns.Add("DISPOSITIVO", typeof(string));
+                dataTable.Columns.Add("PUNTO", typeof(string));
+
+                dataTable.Columns["DISPOSITIVO"].SetOrdinal(inFileColumnIndex + 1);
+                dataTable.Columns["PUNTO"].SetOrdinal(inFileColumnIndex + 2);
+
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    string folderValue = row["FOLDER"].ToString();
+                    string[] parts = folderValue.Split(new char[] { '\\' }, 2);
+                    if (parts.Length > 1)
+                    {
+                        row["DISPOSITIVO"] = parts[0];
+                        row["PUNTO"] = parts[1].Replace('\\', '_');
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("No se encontró la columna 'FOLDER' en el archivo CSV.");
+                return;
+            }
+
+            // Save the DataTable as an Excel file
+            string xlsxFilePath = Path.ChangeExtension(filePath, ".xlsx");
+            using (ExcelPackage package = new ExcelPackage())
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Sheet1");
+                worksheet.Cells["A1"].LoadFromDataTable(dataTable, true);
+                package.SaveAs(new FileInfo(xlsxFilePath));
+            }
+            DialogResult result = MessageBox.Show("¿Quieres procesar los audios?", "Confirmación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                ProcessExcelFile(xlsxFilePath);
+            }
+        }
+
         private void ProcessExcelFile(string filePath)
         {
             FileInfo fileInfo = new FileInfo(filePath);
@@ -123,8 +206,6 @@ namespace Project_ShortBat
             // Llamar a método para copiar archivos
             CopyFilesToFolder(murcielagos);
         }
-
-
 
         private void CopyFilesToFolder(List<Murcielago> murcielagos)
         {
@@ -278,7 +359,6 @@ namespace Project_ShortBat
             especiesCount[key]++;
         }
 
-
         private void UpdateStatusRichTextBox(string fileName, bool found, bool success, bool limit = false)
         {
             matrix.Invoke((MethodInvoker)delegate
@@ -331,7 +411,6 @@ namespace Project_ShortBat
                 matrix.ScrollToCaret();
             });
         }
-
 
         private void especiesSwitch_CheckedChanged(object sender, EventArgs e)
         {

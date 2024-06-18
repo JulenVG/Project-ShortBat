@@ -44,6 +44,8 @@
             buttonSelectDestinationFolder = new Button();
             versionLabel = new MaterialSkin.Controls.MaterialLabel();
             pictureBox2 = new PictureBox();
+            loadCSV = new MaterialSkin.Controls.MaterialButton();
+            materialLabel2 = new MaterialSkin.Controls.MaterialLabel();
             materialCard1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             materialCard2.SuspendLayout();
@@ -59,14 +61,14 @@
             loadExcel.Depth = 0;
             loadExcel.HighEmphasis = true;
             loadExcel.Icon = null;
-            loadExcel.Location = new Point(70, 373);
+            loadExcel.Location = new Point(37, 373);
             loadExcel.Margin = new Padding(4, 6, 4, 6);
             loadExcel.MouseState = MaterialSkin.MouseState.HOVER;
             loadExcel.Name = "loadExcel";
             loadExcel.NoAccentTextColor = Color.Empty;
-            loadExcel.Size = new Size(126, 36);
+            loadExcel.Size = new Size(118, 36);
             loadExcel.TabIndex = 0;
-            loadExcel.Text = "Cargar Excel";
+            loadExcel.Text = "Cargar XLSX";
             loadExcel.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
             loadExcel.UseAccentColor = false;
             loadExcel.UseVisualStyleBackColor = false;
@@ -232,7 +234,7 @@
             buttonSelectDestinationFolder.BackgroundImageLayout = ImageLayout.Zoom;
             buttonSelectDestinationFolder.FlatAppearance.BorderSize = 0;
             buttonSelectDestinationFolder.FlatStyle = FlatStyle.Flat;
-            buttonSelectDestinationFolder.Location = new Point(212, 373);
+            buttonSelectDestinationFolder.Location = new Point(140, 418);
             buttonSelectDestinationFolder.Name = "buttonSelectDestinationFolder";
             buttonSelectDestinationFolder.Size = new Size(62, 36);
             buttonSelectDestinationFolder.TabIndex = 9;
@@ -264,16 +266,54 @@
             pictureBox2.TabIndex = 12;
             pictureBox2.TabStop = false;
             // 
+            // loadCSV
+            // 
+            loadCSV.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            loadCSV.BackColor = Color.Gold;
+            loadCSV.Cursor = Cursors.Hand;
+            loadCSV.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            loadCSV.Depth = 0;
+            loadCSV.HighEmphasis = true;
+            loadCSV.Icon = null;
+            loadCSV.Location = new Point(183, 373);
+            loadCSV.Margin = new Padding(4, 6, 4, 6);
+            loadCSV.MouseState = MaterialSkin.MouseState.HOVER;
+            loadCSV.Name = "loadCSV";
+            loadCSV.NoAccentTextColor = Color.Empty;
+            loadCSV.Size = new Size(110, 36);
+            loadCSV.TabIndex = 13;
+            loadCSV.Text = "Cargar CSV";
+            loadCSV.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            loadCSV.UseAccentColor = false;
+            loadCSV.UseVisualStyleBackColor = false;
+            loadCSV.Click += loadCSV_Click;
+            // 
+            // materialLabel2
+            // 
+            materialLabel2.AutoSize = true;
+            materialLabel2.Depth = 0;
+            materialLabel2.Font = new Font("Roboto", 10F, FontStyle.Regular, GraphicsUnit.Pixel);
+            materialLabel2.FontType = MaterialSkin.MaterialSkinManager.fontType.Overline;
+            materialLabel2.ForeColor = SystemColors.ControlText;
+            materialLabel2.Location = new Point(267, 396);
+            materialLabel2.MouseState = MaterialSkin.MouseState.HOVER;
+            materialLabel2.Name = "materialLabel2";
+            materialLabel2.Size = new Size(26, 13);
+            materialLabel2.TabIndex = 14;
+            materialLabel2.Text = "BETA";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(64, 64, 64);
             ClientSize = new Size(966, 766);
+            Controls.Add(materialLabel2);
+            Controls.Add(buttonSelectDestinationFolder);
+            Controls.Add(loadCSV);
             Controls.Add(materialCard1);
             Controls.Add(pictureBox2);
             Controls.Add(versionLabel);
-            Controls.Add(buttonSelectDestinationFolder);
             Controls.Add(materialCard2);
             Controls.Add(materialProgressBar1);
             Controls.Add(loadExcel);
@@ -308,5 +348,7 @@
         private PictureBox pictureBox1;
         private PictureBox pictureBox2;
         private MaterialSkin.Controls.MaterialSwitch dispositiveSwitch;
+        private MaterialSkin.Controls.MaterialButton loadCSV;
+        private MaterialSkin.Controls.MaterialLabel materialLabel2;
     }
 }
