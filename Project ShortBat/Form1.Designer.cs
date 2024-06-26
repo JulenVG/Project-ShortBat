@@ -61,7 +61,7 @@
             loadExcel.Depth = 0;
             loadExcel.HighEmphasis = true;
             loadExcel.Icon = null;
-            loadExcel.Location = new Point(37, 373);
+            loadExcel.Location = new Point(37, 344);
             loadExcel.Margin = new Padding(4, 6, 4, 6);
             loadExcel.MouseState = MaterialSkin.MouseState.HOVER;
             loadExcel.Name = "loadExcel";
@@ -82,7 +82,7 @@
             matrix.Location = new Point(49, 17);
             matrix.Name = "matrix";
             matrix.ReadOnly = true;
-            matrix.Size = new Size(529, 587);
+            matrix.Size = new Size(529, 546);
             matrix.TabIndex = 1;
             matrix.Text = "";
             // 
@@ -93,12 +93,12 @@
             materialCard1.Controls.Add(pictureBox1);
             materialCard1.Depth = 0;
             materialCard1.ForeColor = Color.FromArgb(222, 0, 0, 0);
-            materialCard1.Location = new Point(321, 110);
+            materialCard1.Location = new Point(321, 81);
             materialCard1.Margin = new Padding(14);
             materialCard1.MouseState = MaterialSkin.MouseState.HOVER;
             materialCard1.Name = "materialCard1";
             materialCard1.Padding = new Padding(14);
-            materialCard1.Size = new Size(595, 621);
+            materialCard1.Size = new Size(599, 578);
             materialCard1.TabIndex = 3;
             // 
             // pictureBox1
@@ -115,7 +115,7 @@
             // materialProgressBar1
             // 
             materialProgressBar1.Depth = 0;
-            materialProgressBar1.Location = new Point(0, 760);
+            materialProgressBar1.Location = new Point(1, 689);
             materialProgressBar1.MouseState = MaterialSkin.MouseState.HOVER;
             materialProgressBar1.Name = "materialProgressBar1";
             materialProgressBar1.Size = new Size(967, 5);
@@ -163,7 +163,7 @@
             materialCard2.Controls.Add(subFileSwitch);
             materialCard2.Depth = 0;
             materialCard2.ForeColor = Color.FromArgb(222, 0, 0, 0);
-            materialCard2.Location = new Point(37, 110);
+            materialCard2.Location = new Point(37, 81);
             materialCard2.Margin = new Padding(14);
             materialCard2.MouseState = MaterialSkin.MouseState.HOVER;
             materialCard2.Name = "materialCard2";
@@ -234,7 +234,7 @@
             buttonSelectDestinationFolder.BackgroundImageLayout = ImageLayout.Zoom;
             buttonSelectDestinationFolder.FlatAppearance.BorderSize = 0;
             buttonSelectDestinationFolder.FlatStyle = FlatStyle.Flat;
-            buttonSelectDestinationFolder.Location = new Point(140, 418);
+            buttonSelectDestinationFolder.Location = new Point(140, 389);
             buttonSelectDestinationFolder.Name = "buttonSelectDestinationFolder";
             buttonSelectDestinationFolder.Size = new Size(62, 36);
             buttonSelectDestinationFolder.TabIndex = 9;
@@ -248,7 +248,7 @@
             versionLabel.Font = new Font("Roboto", 10F, FontStyle.Regular, GraphicsUnit.Pixel);
             versionLabel.FontType = MaterialSkin.MaterialSkinManager.fontType.Overline;
             versionLabel.ForeColor = SystemColors.ControlText;
-            versionLabel.Location = new Point(903, 744);
+            versionLabel.Location = new Point(896, 673);
             versionLabel.MouseState = MaterialSkin.MouseState.HOVER;
             versionLabel.Name = "versionLabel";
             versionLabel.Size = new Size(64, 13);
@@ -259,7 +259,7 @@
             // 
             pictureBox2.BackColor = Color.Transparent;
             pictureBox2.Image = (Image)resources.GetObject("pictureBox2.Image");
-            pictureBox2.Location = new Point(162, 429);
+            pictureBox2.Location = new Point(162, 400);
             pictureBox2.Name = "pictureBox2";
             pictureBox2.Size = new Size(212, 229);
             pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
@@ -275,7 +275,7 @@
             loadCSV.Depth = 0;
             loadCSV.HighEmphasis = true;
             loadCSV.Icon = null;
-            loadCSV.Location = new Point(183, 373);
+            loadCSV.Location = new Point(183, 344);
             loadCSV.Margin = new Padding(4, 6, 4, 6);
             loadCSV.MouseState = MaterialSkin.MouseState.HOVER;
             loadCSV.Name = "loadCSV";
@@ -295,7 +295,7 @@
             materialLabel2.Font = new Font("Roboto", 10F, FontStyle.Regular, GraphicsUnit.Pixel);
             materialLabel2.FontType = MaterialSkin.MaterialSkinManager.fontType.Overline;
             materialLabel2.ForeColor = SystemColors.ControlText;
-            materialLabel2.Location = new Point(267, 396);
+            materialLabel2.Location = new Point(267, 367);
             materialLabel2.MouseState = MaterialSkin.MouseState.HOVER;
             materialLabel2.Name = "materialLabel2";
             materialLabel2.Size = new Size(26, 13);
@@ -307,7 +307,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(64, 64, 64);
-            ClientSize = new Size(966, 766);
+            ClientSize = new Size(966, 695);
             Controls.Add(materialLabel2);
             Controls.Add(buttonSelectDestinationFolder);
             Controls.Add(loadCSV);
