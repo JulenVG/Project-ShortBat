@@ -33,10 +33,12 @@
             matrix = new RichTextBox();
             materialCard1 = new MaterialSkin.Controls.MaterialCard();
             pictureBox1 = new PictureBox();
+            buttonStop = new MaterialSkin.Controls.MaterialButton();
             materialProgressBar1 = new MaterialSkin.Controls.MaterialProgressBar();
             subFileSwitch = new MaterialSkin.Controls.MaterialSwitch();
             especiesSwitch = new MaterialSkin.Controls.MaterialSwitch();
             materialCard2 = new MaterialSkin.Controls.MaterialCard();
+            pippiSwitch = new MaterialSkin.Controls.MaterialSwitch();
             dispositiveSwitch = new MaterialSkin.Controls.MaterialSwitch();
             enableLimit = new MaterialSkin.Controls.MaterialSwitch();
             cantEspecies = new MaterialSkin.Controls.MaterialSlider();
@@ -61,7 +63,7 @@
             loadExcel.Depth = 0;
             loadExcel.HighEmphasis = true;
             loadExcel.Icon = null;
-            loadExcel.Location = new Point(37, 344);
+            loadExcel.Location = new Point(37, 373);
             loadExcel.Margin = new Padding(4, 6, 4, 6);
             loadExcel.MouseState = MaterialSkin.MouseState.HOVER;
             loadExcel.Name = "loadExcel";
@@ -82,7 +84,7 @@
             matrix.Location = new Point(49, 17);
             matrix.Name = "matrix";
             matrix.ReadOnly = true;
-            matrix.Size = new Size(529, 546);
+            matrix.Size = new Size(529, 544);
             matrix.TabIndex = 1;
             matrix.Text = "";
             // 
@@ -105,12 +107,33 @@
             // 
             pictureBox1.BackColor = Color.Transparent;
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(-158, 319);
+            pictureBox1.Location = new Point(-158, 348);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(212, 229);
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox1.TabIndex = 11;
             pictureBox1.TabStop = false;
+            // 
+            // buttonStop
+            // 
+            buttonStop.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            buttonStop.BackColor = Color.Gold;
+            buttonStop.Cursor = Cursors.Hand;
+            buttonStop.Density = MaterialSkin.Controls.MaterialButton.MaterialButtonDensity.Default;
+            buttonStop.Depth = 0;
+            buttonStop.HighEmphasis = true;
+            buttonStop.Icon = null;
+            buttonStop.Location = new Point(863, 26);
+            buttonStop.Margin = new Padding(4, 6, 4, 6);
+            buttonStop.MouseState = MaterialSkin.MouseState.HOVER;
+            buttonStop.Name = "buttonStop";
+            buttonStop.NoAccentTextColor = Color.Empty;
+            buttonStop.Size = new Size(96, 36);
+            buttonStop.TabIndex = 15;
+            buttonStop.Text = "Cancelar";
+            buttonStop.Type = MaterialSkin.Controls.MaterialButton.MaterialButtonType.Contained;
+            buttonStop.UseAccentColor = false;
+            buttonStop.UseVisualStyleBackColor = false;
             // 
             // materialProgressBar1
             // 
@@ -155,6 +178,7 @@
             // materialCard2
             // 
             materialCard2.BackColor = Color.FromArgb(255, 255, 255);
+            materialCard2.Controls.Add(pippiSwitch);
             materialCard2.Controls.Add(dispositiveSwitch);
             materialCard2.Controls.Add(enableLimit);
             materialCard2.Controls.Add(cantEspecies);
@@ -168,8 +192,23 @@
             materialCard2.MouseState = MaterialSkin.MouseState.HOVER;
             materialCard2.Name = "materialCard2";
             materialCard2.Padding = new Padding(14);
-            materialCard2.Size = new Size(256, 249);
+            materialCard2.Size = new Size(256, 281);
             materialCard2.TabIndex = 8;
+            // 
+            // pippiSwitch
+            // 
+            pippiSwitch.AutoSize = true;
+            pippiSwitch.Depth = 0;
+            pippiSwitch.Location = new Point(14, 155);
+            pippiSwitch.Margin = new Padding(0);
+            pippiSwitch.MouseLocation = new Point(-1, -1);
+            pippiSwitch.MouseState = MaterialSkin.MouseState.HOVER;
+            pippiSwitch.Name = "pippiSwitch";
+            pippiSwitch.Ripple = true;
+            pippiSwitch.Size = new Size(157, 37);
+            pippiSwitch.TabIndex = 13;
+            pippiSwitch.Text = "Excluir PIPPIP";
+            pippiSwitch.UseVisualStyleBackColor = true;
             // 
             // dispositiveSwitch
             // 
@@ -191,7 +230,7 @@
             // 
             enableLimit.AutoSize = true;
             enableLimit.Depth = 0;
-            enableLimit.Location = new Point(14, 155);
+            enableLimit.Location = new Point(14, 192);
             enableLimit.Margin = new Padding(0);
             enableLimit.MouseLocation = new Point(-1, -1);
             enableLimit.MouseState = MaterialSkin.MouseState.HOVER;
@@ -207,7 +246,7 @@
             // 
             cantEspecies.Depth = 0;
             cantEspecies.ForeColor = Color.FromArgb(222, 0, 0, 0);
-            cantEspecies.Location = new Point(2, 195);
+            cantEspecies.Location = new Point(2, 232);
             cantEspecies.MouseState = MaterialSkin.MouseState.HOVER;
             cantEspecies.Name = "cantEspecies";
             cantEspecies.Size = new Size(237, 40);
@@ -234,7 +273,7 @@
             buttonSelectDestinationFolder.BackgroundImageLayout = ImageLayout.Zoom;
             buttonSelectDestinationFolder.FlatAppearance.BorderSize = 0;
             buttonSelectDestinationFolder.FlatStyle = FlatStyle.Flat;
-            buttonSelectDestinationFolder.Location = new Point(140, 389);
+            buttonSelectDestinationFolder.Location = new Point(140, 417);
             buttonSelectDestinationFolder.Name = "buttonSelectDestinationFolder";
             buttonSelectDestinationFolder.Size = new Size(62, 36);
             buttonSelectDestinationFolder.TabIndex = 9;
@@ -259,7 +298,7 @@
             // 
             pictureBox2.BackColor = Color.Transparent;
             pictureBox2.Image = (Image)resources.GetObject("pictureBox2.Image");
-            pictureBox2.Location = new Point(162, 400);
+            pictureBox2.Location = new Point(162, 429);
             pictureBox2.Name = "pictureBox2";
             pictureBox2.Size = new Size(212, 229);
             pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
@@ -275,7 +314,7 @@
             loadCSV.Depth = 0;
             loadCSV.HighEmphasis = true;
             loadCSV.Icon = null;
-            loadCSV.Location = new Point(183, 344);
+            loadCSV.Location = new Point(183, 373);
             loadCSV.Margin = new Padding(4, 6, 4, 6);
             loadCSV.MouseState = MaterialSkin.MouseState.HOVER;
             loadCSV.Name = "loadCSV";
@@ -295,7 +334,7 @@
             materialLabel2.Font = new Font("Roboto", 10F, FontStyle.Regular, GraphicsUnit.Pixel);
             materialLabel2.FontType = MaterialSkin.MaterialSkinManager.fontType.Overline;
             materialLabel2.ForeColor = SystemColors.ControlText;
-            materialLabel2.Location = new Point(267, 367);
+            materialLabel2.Location = new Point(267, 396);
             materialLabel2.MouseState = MaterialSkin.MouseState.HOVER;
             materialLabel2.Name = "materialLabel2";
             materialLabel2.Size = new Size(26, 13);
@@ -308,6 +347,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(64, 64, 64);
             ClientSize = new Size(966, 695);
+            Controls.Add(buttonStop);
             Controls.Add(materialLabel2);
             Controls.Add(buttonSelectDestinationFolder);
             Controls.Add(loadCSV);
@@ -350,5 +390,7 @@
         private MaterialSkin.Controls.MaterialSwitch dispositiveSwitch;
         private MaterialSkin.Controls.MaterialButton loadCSV;
         private MaterialSkin.Controls.MaterialLabel materialLabel2;
+        private MaterialSkin.Controls.MaterialSwitch pippiSwitch;
+        private MaterialSkin.Controls.MaterialButton buttonStop;
     }
 }

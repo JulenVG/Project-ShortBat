@@ -19,6 +19,8 @@ namespace Project_ShortBat
     public partial class Form1 : MaterialForm
     {
         private string destinationFolderPath;
+        private bool stopCopyingFiles = false;
+
         public Form1()
         {
             InitializeComponent();
@@ -31,12 +33,22 @@ namespace Project_ShortBat
             enableLimit.Enabled = false;
             subFileSwitch.Checked = true;
             dispositiveSwitch.Checked = true;
+            pippiSwitch.Checked = true;
+
+            //Control del botón de cancelar copiado
+            buttonStop.Click += new EventHandler(buttonStop_Click);
+            buttonStop.Enabled = false;
+            buttonStop.Visible = false;
 
             string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             versionLabel.Text = $"Ver. {version}";
 
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             destinationFolderPath = Path.Combine(desktopPath, "Output");
+        }
+        private void buttonStop_Click(object sender, EventArgs e)
+        {
+            stopCopyingFiles = true;
         }
 
         private void buttonSelectDestinationFolder_Click(object sender, EventArgs e)
@@ -135,7 +147,7 @@ namespace Project_ShortBat
             }
         }
 
-        private void ProcessExcelFile(string filePath)
+        private async void ProcessExcelFile(string filePath)
         {
             FileInfo fileInfo = new FileInfo(filePath);
             List<Murcielago> murcielagos = new List<Murcielago>();
@@ -177,7 +189,7 @@ namespace Project_ShortBat
 
                     if (carpetaColumnIndex == -1 || especieColumnIndex == -1 || audioColumnIndex == -1 || dispositivoColumnIndex == -1)
                     {
-                        MessageBox.Show("No se encontraron columnas necesarias (PUNTO, AUTO ID* o IN FILE) en el archivo Excel.");
+                        MessageBox.Show("No se encontraron columnas necesarias (PUNTO, AUTO ID*, IN FILE o DISPOSITIVO) en el archivo Excel.");
                         return;
                     }
 
@@ -189,7 +201,7 @@ namespace Project_ShortBat
                         string audio = worksheet.Cells[row, audioColumnIndex].Text.Trim();
                         string dispositivo = worksheet.Cells[row, dispositivoColumnIndex].Text.Trim();
 
-                        if (!string.IsNullOrWhiteSpace(audio) && especie != "Noise")
+                        if (!string.IsNullOrWhiteSpace(audio) && especie != "Noise" && (especie != "PIPPIP" || !pippiSwitch.Checked))
                         {
                             murcielagos.Add(new Murcielago
                             {
@@ -204,10 +216,10 @@ namespace Project_ShortBat
             }
 
             // Llamar a método para copiar archivos
-            CopyFilesToFolder(murcielagos);
+            await CopyFilesToFolderAsync(murcielagos);
         }
 
-        private void CopyFilesToFolder(List<Murcielago> murcielagos)
+        private async Task CopyFilesToFolderAsync(List<Murcielago> murcielagos)
         {
             string sourceFolderPath = SelectSourceFolder();
             if (sourceFolderPath == null)
@@ -222,14 +234,24 @@ namespace Project_ShortBat
             Dictionary<string, int> especiesCount = new Dictionary<string, int>();
 
             int copiedFiles = 0;
+            stopCopyingFiles = false;
+            buttonStop.Enabled = true;
+            buttonStop.Visible = true;
 
             foreach (Murcielago murcielago in murcielagos)
             {
-                string[] foundFiles = Directory.GetFiles(sourceFolderPath, murcielago.Audio, SearchOption.AllDirectories);
+                if (stopCopyingFiles)break;
+
+                string[] foundFiles = await Task.Run(() => Directory.GetFiles(sourceFolderPath, murcielago.Audio, SearchOption.AllDirectories));
                 if (foundFiles.Length > 0)
                 {
                     foreach (string foundFile in foundFiles)
                     {
+                        if (stopCopyingFiles)
+                        {
+                            break;
+                        }
+
                         string subFolderPath = GetSubFolderPath(murcielago);
 
                         if (IsExceedingSpeciesLimit(murcielago, especiesCount))
@@ -242,7 +264,7 @@ namespace Project_ShortBat
 
                         try
                         {
-                            File.Copy(foundFile, destinationFilePath);
+                            await Task.Run(() => File.Copy(foundFile, destinationFilePath));
                             UpdateSpeciesCount(murcielago, especiesCount);
                             UpdateStatusRichTextBox(murcielago.Audio, true, true);
                             copiedFiles++;
@@ -261,8 +283,20 @@ namespace Project_ShortBat
                 materialProgressBar1.Value = Math.Min(materialProgressBar1.Value + 1, materialProgressBar1.Maximum);
             }
 
-            MessageBox.Show(copiedFiles > 0 ? $"Se han copiado {copiedFiles} archivos de {murcielagos.Count}." : "No se han encontrado archivos.");
+            buttonStop.Enabled = false;
+            buttonStop.Visible = false;
+
+            if (stopCopyingFiles)
+            {
+                MessageBox.Show("La operación de copia de archivos fue detenida.");
+            }
+            else
+            {
+                MessageBox.Show(copiedFiles > 0 ? $"Se han copiado {copiedFiles} archivos de {murcielagos.Count}." : "No se han encontrado archivos.");
+            }
         }
+
+
 
         private string SelectSourceFolder()
         {
@@ -294,24 +328,24 @@ namespace Project_ShortBat
         private string GetSubFolderPath(Murcielago murcielago)
         {
             string subFolderPath = destinationFolderPath;
+            if (dispositiveSwitch.Checked)
+            {
+                subFolderPath = Path.Combine(destinationFolderPath, murcielago.Dispositivo);
+                if (!Directory.Exists(subFolderPath))
+                {
+                    Directory.CreateDirectory(subFolderPath);
+                }
+            }
 
             if (subFileSwitch.Checked)
             {
-                subFolderPath = Path.Combine(destinationFolderPath, murcielago.Carpeta);
+                subFolderPath = Path.Combine(subFolderPath, murcielago.Carpeta);
                 if (!Directory.Exists(subFolderPath))
                 {
                     Directory.CreateDirectory(subFolderPath);
                 }
             }
 
-            if (dispositiveSwitch.Checked)
-            {
-                subFolderPath = Path.Combine(subFolderPath, murcielago.Dispositivo);
-                if (!Directory.Exists(subFolderPath))
-                {
-                    Directory.CreateDirectory(subFolderPath);
-                }
-            }
 
             if (especiesSwitch.Checked)
             {
@@ -361,56 +395,60 @@ namespace Project_ShortBat
 
         private void UpdateStatusRichTextBox(string fileName, bool found, bool success, bool limit = false)
         {
-            matrix.Invoke((MethodInvoker)delegate
+            if (matrix.InvokeRequired)
             {
-                matrix.SelectionStart = matrix.TextLength;
-                matrix.SelectionLength = 0;
-                matrix.SelectionFont = new Font("Cascadia Code SemiBold", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+                matrix.Invoke(new MethodInvoker(() => UpdateStatusRichTextBox(fileName, found, success, limit)));
+                return;
+            }
 
-                // Configuración de colores predeterminada
-                Color fileNameColor = Color.FromArgb(165, 127, 248);
-                Color arrowColor = Color.FromArgb(165, 107, 196);
-                Color messageColor;
-                string message;
+            matrix.SelectionStart = matrix.TextLength;
+            matrix.SelectionLength = 0;
+            matrix.SelectionFont = new Font("Cascadia Code SemiBold", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
 
-                if (limit)
+            // Configuración de colores predeterminada
+            Color fileNameColor = Color.FromArgb(165, 127, 248);
+            Color arrowColor = Color.FromArgb(165, 107, 196);
+            Color messageColor;
+            string message;
+
+            if (limit)
+            {
+                messageColor = Color.FromArgb(255, 165, 0);
+                message = " Límite de especie alcanzado";
+            }
+            else if (found)
+            {
+                if (success)
                 {
-                    messageColor = Color.FromArgb(255, 165, 0);
-                    message = " Límite de especie alcanzado";
-                }
-                else if (found)
-                {
-                    if (success)
-                    {
-                        messageColor = Color.FromArgb(0, 255, 127);
-                        message = " Archivo copiado con éxito";
-                    }
-                    else
-                    {
-                        messageColor = Color.FromArgb(217, 108, 104);
-                        message = " Archivo repetido";
-                    }
+                    messageColor = Color.FromArgb(0, 255, 127);
+                    message = " Archivo copiado con éxito";
                 }
                 else
                 {
-                    messageColor = Color.FromArgb(255, 99, 71);
-                    message = " Archivo no encontrado";
+                    messageColor = Color.FromArgb(217, 108, 104);
+                    message = " Archivo repetido";
                 }
+            }
+            else
+            {
+                messageColor = Color.FromArgb(255, 99, 71);
+                message = " Archivo no encontrado";
+            }
 
-                // Aplicar colores y texto
-                matrix.SelectionColor = fileNameColor;
-                matrix.AppendText(fileName);
-                matrix.SelectionColor = arrowColor;
-                matrix.AppendText(" \u2192");
-                matrix.SelectionColor = messageColor;
-                matrix.AppendText(message + Environment.NewLine);
+            // Aplicar colores y texto
+            matrix.SelectionColor = fileNameColor;
+            matrix.AppendText(fileName);
+            matrix.SelectionColor = arrowColor;
+            matrix.AppendText(" \u2192");
+            matrix.SelectionColor = messageColor;
+            matrix.AppendText(message + Environment.NewLine);
 
-                // Restablecer color y desplazar caret
-                matrix.SelectionColor = matrix.ForeColor;
-                matrix.SelectionStart = matrix.Text.Length;
-                matrix.ScrollToCaret();
-            });
+            // Restablecer color y desplazar caret
+            matrix.SelectionColor = matrix.ForeColor;
+            matrix.SelectionStart = matrix.Text.Length;
+            matrix.ScrollToCaret();
         }
+
 
         private void especiesSwitch_CheckedChanged(object sender, EventArgs e)
         {
