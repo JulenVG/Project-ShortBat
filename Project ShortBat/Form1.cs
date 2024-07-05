@@ -132,6 +132,30 @@ namespace Project_ShortBat
                 return;
             }
 
+            if (dataTable.Columns.Contains("DATE"))
+            {
+                int inFileColumnIndex = dataTable.Columns["DATE"].Ordinal;
+
+                dataTable.Columns.Add("MES", typeof(string));
+                dataTable.Columns["MES"].SetOrdinal(inFileColumnIndex + 1);
+
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    if (DateTime.TryParse(row["DATE"].ToString(), out DateTime dateValue))
+                    {
+                        row["MES"] = dateValue.Month.ToString("D");
+                    }
+                    else
+                    {
+                        row["MES"] = DBNull.Value;
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("No se encontró la columna 'DATE' en el archivo CSV.");
+                return;
+            }
             // Save the DataTable as an Excel file
             string xlsxFilePath = Path.ChangeExtension(filePath, ".xlsx");
             using (ExcelPackage package = new ExcelPackage())
